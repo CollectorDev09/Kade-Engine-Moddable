@@ -1,23 +1,21 @@
 package;
 
-import openfl.utils.Assets as OpenFlAssets;
+import lime.utils.Assets;
 
 using StringTools;
 
 class CoolUtil
 {
-	public static var difficultyArray:Array<String> = ['Easy', "Normal", "Hard"];
+	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
 
-	public static var daPixelZoom:Float = 6;
-
-	public static function difficultyFromInt(difficulty:Int):String
+	public static function difficultyString():String
 	{
-		return difficultyArray[difficulty];
+		return difficultyArray[PlayState.storyDifficulty];
 	}
 
 	public static function coolTextFile(path:String):Array<String>
 	{
-		var daList:Array<String> = OpenFlAssets.getText(path).trim().split('\n');
+		var daList:Array<String> = Assets.getText(path).trim().split('\n');
 
 		for (i in 0...daList.length)
 		{
@@ -26,18 +24,18 @@ class CoolUtil
 
 		return daList;
 	}
-
+	
 	public static function coolStringFile(path:String):Array<String>
-	{
-		var daList:Array<String> = path.trim().split('\n');
-
-		for (i in 0...daList.length)
 		{
-			daList[i] = daList[i].trim();
+			var daList:Array<String> = path.trim().split('\n');
+	
+			for (i in 0...daList.length)
+			{
+				daList[i] = daList[i].trim();
+			}
+	
+			return daList;
 		}
-
-		return daList;
-	}
 
 	public static function numberArray(max:Int, ?min = 0):Array<Int>
 	{

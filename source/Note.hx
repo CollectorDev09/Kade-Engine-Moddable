@@ -9,22 +9,15 @@ import flixel.util.FlxColor;
 #if polymod
 import polymod.format.ParseRules.TargetSignatureElement;
 #end
-import PlayState;
 
 using StringTools;
 
 class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
-	public var baseStrum:Float = 0;
-
-	public var charterSelected:Bool = false;
-
-	public var rStrumTime:Float = 0;
 
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
-	public var rawNoteData:Int = 0;
 	public var canBeHit:Bool = false;
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
@@ -32,20 +25,8 @@ class Note extends FlxSprite
 	public var modifiedByLua:Bool = false;
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
-	public var originColor:Int = 0; // The sustain note's original note's color
-	public var noteSection:Int = 0;
-
-	public var luaID:Int = 0;
-
-	public var isAlt:Bool = false;
-
-	public var noteCharterObject:FlxSprite;
 
 	public var noteScore:Float = 1;
-
-	public var noteYOff:Int = 0;
-
-	public var beat:Float = 0;
 
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
@@ -55,31 +36,12 @@ class Note extends FlxSprite
 
 	public var rating:String = "shit";
 
-	public var modAngle:Float = 0; // The angle set by modcharts
-	public var localAngle:Float = 0; // The angle to be edited inside Note.hx
-	public var originAngle:Float = 0; // The angle the OG note of the sus note had (?)
-
-	public var dataColor:Array<String> = ['purple', 'blue', 'green', 'red'];
-	public var quantityColor:Array<Int> = [RED_NOTE, 2, BLUE_NOTE, 2, PURP_NOTE, 2, GREEN_NOTE, 2];
-	public var arrowAngles:Array<Int> = [180, 90, 270, 0];
-
-	public var isParent:Bool = false;
-	public var parent:Note = null;
-	public var spotInLine:Int = 0;
-	public var sustainActive:Bool = true;
-
-	public var children:Array<Note> = [];
-
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inCharter:Bool = false, ?isAlt:Bool = false, ?bet:Float = 0)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
 		super();
 
 		if (prevNote == null)
 			prevNote = this;
-
-		beat = bet;
-
-		this.isAlt = isAlt;
 
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
@@ -87,178 +49,134 @@ class Note extends FlxSprite
 		x += 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
+		this.strumTime = strumTime;
 
-		if (inCharter)
-		{
-			this.strumTime = strumTime;
-			rStrumTime = strumTime;
-		}
-		else
-		{
-			this.strumTime = strumTime;
-			#if FEATURE_STEPMANIA
-			if (PlayState.isSM)
-			{
-				rStrumTime = strumTime;
-			}
-			else
-				rStrumTime = strumTime;
-			#else
-			rStrumTime = strumTime;
-			#end
-		}
-
-		if (this.strumTime < 0)
+		if (this.strumTime < 0 )
 			this.strumTime = 0;
-
-		if (!inCharter)
-			y += FlxG.save.data.offset + PlayState.songOffset;
 
 		this.noteData = noteData;
 
-		var daStage:String = ((PlayState.instance != null && !PlayStateChangeables.Optimize) ? PlayState.Stage.curStage : 'stage');
+		var daStage:String = PlayState.curStage;
 
-		// defaults if no noteStyle was found in chart
-		var noteTypeCheck:String = 'normal';
-
-		if (inCharter)
+		switch (daStage)
 		{
-			frames = PlayState.noteskinSprite;
+			case 'school' | 'schoolEvil':
+				loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
 
-			for (i in 0...4)
-			{
-				animation.addByPrefix(dataColor[i] + 'Scroll', dataColor[i] + ' alone'); // Normal notes
-				animation.addByPrefix(dataColor[i] + 'hold', dataColor[i] + ' hold'); // Hold
-				animation.addByPrefix(dataColor[i] + 'holdend', dataColor[i] + ' tail'); // Tails
-			}
+				animation.add('greenScroll', [6]);
+				animation.add('redScroll', [7]);
+				animation.add('blueScroll', [5]);
+				animation.add('purpleScroll', [4]);
 
-			setGraphicSize(Std.int(width * 0.7));
-			updateHitbox();
-			antialiasing = FlxG.save.data.antialiasing;
-		}
-		else
-		{
-			if (PlayState.SONG.noteStyle == null)
-			{
-				switch (PlayState.storyWeek)
+				if (isSustainNote)
 				{
-					case 6:
-						noteTypeCheck = 'pixel';
+					loadGraphic(Paths.image('weeb/pixelUI/arrowEnds'), true, 7, 6);
+
+					animation.add('purpleholdend', [4]);
+					animation.add('greenholdend', [6]);
+					animation.add('redholdend', [7]);
+					animation.add('blueholdend', [5]);
+
+					animation.add('purplehold', [0]);
+					animation.add('greenhold', [2]);
+					animation.add('redhold', [3]);
+					animation.add('bluehold', [1]);
 				}
-			}
-			else
-			{
-				noteTypeCheck = PlayState.SONG.noteStyle;
-			}
 
-			switch (noteTypeCheck)
-			{
-				case 'pixel':
-					loadGraphic(PlayState.noteskinPixelSprite, true, 17, 17);
-					if (isSustainNote)
-						loadGraphic(PlayState.noteskinPixelSpriteEnds, true, 7, 6);
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+				updateHitbox();
 
-					for (i in 0...4)
-					{
-						animation.add(dataColor[i] + 'Scroll', [i + 4]); // Normal notes
-						animation.add(dataColor[i] + 'hold', [i]); // Holds
-						animation.add(dataColor[i] + 'holdend', [i + 4]); // Tails
-					}
+			default:
+				frames = Paths.getSparrowAtlas('NOTE_assets');
 
-					setGraphicSize(Std.int(width * CoolUtil.daPixelZoom));
-					updateHitbox();
-				default:
-					frames = PlayState.noteskinSprite;
+				animation.addByPrefix('greenScroll', 'green0');
+				animation.addByPrefix('redScroll', 'red0');
+				animation.addByPrefix('blueScroll', 'blue0');
+				animation.addByPrefix('purpleScroll', 'purple0');
 
-					for (i in 0...4)
-					{
-						animation.addByPrefix(dataColor[i] + 'Scroll', dataColor[i] + ' alone'); // Normal notes
-						animation.addByPrefix(dataColor[i] + 'hold', dataColor[i] + ' hold'); // Hold
-						animation.addByPrefix(dataColor[i] + 'holdend', dataColor[i] + ' tail'); // Tails
-					}
+				animation.addByPrefix('purpleholdend', 'pruple end hold');
+				animation.addByPrefix('greenholdend', 'green hold end');
+				animation.addByPrefix('redholdend', 'red hold end');
+				animation.addByPrefix('blueholdend', 'blue hold end');
 
-					setGraphicSize(Std.int(width * 0.7));
-					updateHitbox();
+				animation.addByPrefix('purplehold', 'purple hold piece');
+				animation.addByPrefix('greenhold', 'green hold piece');
+				animation.addByPrefix('redhold', 'red hold piece');
+				animation.addByPrefix('bluehold', 'blue hold piece');
 
-					antialiasing = FlxG.save.data.antialiasing;
-			}
+				setGraphicSize(Std.int(width * 0.7));
+				updateHitbox();
+				antialiasing = true;
 		}
 
-		x += swagWidth * noteData;
-		animation.play(dataColor[noteData] + 'Scroll');
-		originColor = noteData; // The note's origin color will be checked by its sustain notes
-
-		if (FlxG.save.data.stepMania && !isSustainNote && !PlayState.instance.executeModchart)
+		switch (noteData)
 		{
-			var col:Int = 0;
-
-			var beatRow = Math.round(beat * 48);
-
-			// STOLEN ETTERNA CODE (IN 2002)
-
-			if (beatRow % (192 / 4) == 0)
-				col = quantityColor[0];
-			else if (beatRow % (192 / 8) == 0)
-				col = quantityColor[2];
-			else if (beatRow % (192 / 12) == 0)
-				col = quantityColor[4];
-			else if (beatRow % (192 / 16) == 0)
-				col = quantityColor[6];
-			else if (beatRow % (192 / 24) == 0)
-				col = quantityColor[4];
-			else if (beatRow % (192 / 32) == 0)
-				col = quantityColor[4];
-
-			animation.play(dataColor[col] + 'Scroll');
-			localAngle -= arrowAngles[col];
-			localAngle += arrowAngles[noteData];
-			originAngle = localAngle;
-			originColor = col;
+			case 0:
+				x += swagWidth * 0;
+				animation.play('purpleScroll');
+			case 1:
+				x += swagWidth * 1;
+				animation.play('blueScroll');
+			case 2:
+				x += swagWidth * 2;
+				animation.play('greenScroll');
+			case 3:
+				x += swagWidth * 3;
+				animation.play('redScroll');
 		}
+
+		// trace(prevNote);
 
 		// we make sure its downscroll and its a SUSTAIN NOTE (aka a trail, not a note)
 		// and flip it so it doesn't look weird.
 		// THIS DOESN'T FUCKING FLIP THE NOTE, CONTRIBUTERS DON'T JUST COMMENT THIS OUT JESUS
-		// then what is this lol
-		// BRO IT LITERALLY SAYS IT FLIPS IF ITS A TRAIL AND ITS DOWNSCROLL
-		if (FlxG.save.data.downscroll && sustainNote)
+		if (FlxG.save.data.downscroll && sustainNote) 
 			flipY = true;
-
-		var stepHeight = (((0.45 * Conductor.stepCrochet)) * FlxMath.roundDecimal(PlayStateChangeables.scrollSpeed == 1 ? PlayState.SONG.speed : PlayStateChangeables.scrollSpeed,
-			2)) / PlayState.songMultiplier;
 
 		if (isSustainNote && prevNote != null)
 		{
-			noteYOff = Math.round(-stepHeight + swagWidth * 0.5);
-
 			noteScore * 0.2;
 			alpha = 0.6;
 
 			x += width / 2;
 
-			originColor = prevNote.originColor;
-			originAngle = prevNote.originAngle;
+			switch (noteData)
+			{
+				case 2:
+					animation.play('greenholdend');
+				case 3:
+					animation.play('redholdend');
+				case 1:
+					animation.play('blueholdend');
+				case 0:
+					animation.play('purpleholdend');
+			}
 
-			animation.play(dataColor[originColor] + 'holdend'); // This works both for normal colors and quantization colors
 			updateHitbox();
 
 			x -= width / 2;
 
-			// if (noteTypeCheck == 'pixel')
-			//	x += 30;
-			if (inCharter)
+			if (PlayState.curStage.startsWith('school'))
 				x += 30;
 
 			if (prevNote.isSustainNote)
 			{
-				prevNote.animation.play(dataColor[prevNote.originColor] + 'hold');
-				prevNote.updateHitbox();
+				switch (prevNote.noteData)
+				{
+					case 0:
+						prevNote.animation.play('purplehold');
+					case 1:
+						prevNote.animation.play('bluehold');
+					case 2:
+						prevNote.animation.play('greenhold');
+					case 3:
+						prevNote.animation.play('redhold');
+				}
 
-				prevNote.scale.y *= stepHeight / prevNote.height;
+				
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.8 * FlxG.save.data.scrollSpeed;
 				prevNote.updateHitbox();
-
-				if (antialiasing)
-					prevNote.scale.y *= 1.0 + (1.0 / prevNote.frameHeight);
+				// prevNote.setGraphicSize();
 			}
 		}
 	}
@@ -266,48 +184,28 @@ class Note extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if (!modifiedByLua)
-			angle = modAngle + localAngle;
-		else
-			angle = modAngle;
-
-		if (!modifiedByLua)
-		{
-			if (!sustainActive)
-			{
-				alpha = 0.3;
-			}
-		}
 
 		if (mustPress)
 		{
-			if (isSustainNote)
-			{
-				if (strumTime - Conductor.songPosition <= (((166 * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1) * 0.5))
-					&& strumTime - Conductor.songPosition >= (((-166 * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1))))
-					canBeHit = true;
-				else
-					canBeHit = false;
-			}
+			// The * 0.5 is so that it's easier to hit them too late, instead of too early
+			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
+				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
+				canBeHit = true;
 			else
-			{
-				if (strumTime - Conductor.songPosition <= (((166 * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1)))
-					&& strumTime - Conductor.songPosition >= (((-166 * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1))))
-					canBeHit = true;
-				else
-					canBeHit = false;
-			}
-			/*if (strumTime - Conductor.songPosition < (-166 * Conductor.timeScale) && !wasGoodHit)
-				tooLate = true; */
+				canBeHit = false;
+
+			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit)
+				tooLate = true;
 		}
 		else
 		{
 			canBeHit = false;
-			// if (strumTime <= Conductor.songPosition)
-			//	wasGoodHit = true;
+
+			if (strumTime <= Conductor.songPosition)
+				wasGoodHit = true;
 		}
 
-		if (tooLate && !wasGoodHit)
+		if (tooLate)
 		{
 			if (alpha > 0.3)
 				alpha = 0.3;
