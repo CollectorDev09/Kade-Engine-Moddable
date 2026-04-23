@@ -35,6 +35,18 @@ class Paths
 		return getPreloadPath(file);
 	}
 
+    public static function img(key:String, ?type:String)
+    {
+        if (type == null)
+        {
+            return 'assets/images/$key.png';
+        }
+        else
+        {
+            return 'assets/images/$key.$type';
+        }
+    }
+
 	static public function getLibraryPath(file:String, library = "preload")
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);

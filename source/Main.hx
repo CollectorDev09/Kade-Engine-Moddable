@@ -12,6 +12,7 @@ import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
+import lime.app.Application;
 
 class Main extends Sprite
 {
@@ -22,6 +23,9 @@ class Main extends Sprite
 	var framerate:Int = 120; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
+	public static var fnfVer:String = "0.2.7.1";
+	public static var KadeVer:String = "1.4.2";
+	public static var ModdableVer:String;
 
 	public static var watermarks = true; // Whether to put Kade Engine liteartly anywhere
 
@@ -37,6 +41,7 @@ class Main extends Sprite
 
 	public function new()
 	{
+		ModdableVer = Application.current.meta.get('version') + " - EARLY ACCESS";
 		super();
 
 		if (stage != null)

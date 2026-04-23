@@ -190,12 +190,12 @@ class Judgement extends Option
 
 		Conductor.recalculateTimings();
 
-		OptionsMenu.versionShit.text = "Current Safe Frames: " + Conductor.safeFrames + " - Description - " + description + 
-		" - SIK: " + OptionsMenu.truncateFloat(45 * Conductor.timeScale, 0) +
-		"ms GD: " + OptionsMenu.truncateFloat(90 * Conductor.timeScale, 0) +
-		"ms BD: " + OptionsMenu.truncateFloat(135 * Conductor.timeScale, 0) + 
-		"ms SHT: " + OptionsMenu.truncateFloat(155 * Conductor.timeScale, 0) +
-		"ms TOTAL: " + OptionsMenu.truncateFloat(Conductor.safeZoneOffset,0) + "ms";
+		OptionsState.versionShit.text = "Current Safe Frames: " + Conductor.safeFrames + " - Description - " + description + 
+		" - SIK: " + OptionsState.truncateFloat(45 * Conductor.timeScale, 0) +
+		"ms GD: " + OptionsState.truncateFloat(90 * Conductor.timeScale, 0) +
+		"ms BD: " + OptionsState.truncateFloat(135 * Conductor.timeScale, 0) + 
+		"ms SHT: " + OptionsState.truncateFloat(155 * Conductor.timeScale, 0) +
+		"ms TOTAL: " + OptionsState.truncateFloat(Conductor.safeZoneOffset,0) + "ms";
 		return true;
 	}
 
@@ -209,12 +209,12 @@ class Judgement extends Option
 
 		Conductor.recalculateTimings();
 
-		OptionsMenu.versionShit.text = "Current Safe Frames: " + Conductor.safeFrames + " - Description - " + description + 
-		" - SIK: " + OptionsMenu.truncateFloat(45 * Conductor.timeScale, 0) +
-		"ms GD: " + OptionsMenu.truncateFloat(90 * Conductor.timeScale, 0) +
-		"ms BD: " + OptionsMenu.truncateFloat(135 * Conductor.timeScale, 0) + 
-		"ms SHT: " + OptionsMenu.truncateFloat(155 * Conductor.timeScale, 0) +
-		"ms TOTAL: " + OptionsMenu.truncateFloat(Conductor.safeZoneOffset,0) + "ms";
+		OptionsState.versionShit.text = "Current Safe Frames: " + Conductor.safeFrames + " - Description - " + description + 
+		" - SIK: " + OptionsState.truncateFloat(45 * Conductor.timeScale, 0) +
+		"ms GD: " + OptionsState.truncateFloat(90 * Conductor.timeScale, 0) +
+		"ms BD: " + OptionsState.truncateFloat(135 * Conductor.timeScale, 0) + 
+		"ms SHT: " + OptionsState.truncateFloat(155 * Conductor.timeScale, 0) +
+		"ms TOTAL: " + OptionsState.truncateFloat(Conductor.safeZoneOffset,0) + "ms";
 		return true;
 	}
 }
@@ -266,7 +266,7 @@ class FPSCapOption extends Option
 		FlxG.save.data.fpsCap = FlxG.save.data.fpsCap + 10;
 		(cast (Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 
-		OptionsMenu.versionShit.text = "Current FPS Cap: " + FlxG.save.data.fpsCap + " - Description - " + description;
+		OptionsState.versionShit.text = "Current FPS Cap: " + FlxG.save.data.fpsCap + " - Description - " + description;
 
 		return true;
 	}
@@ -277,7 +277,7 @@ class FPSCapOption extends Option
 		FlxG.save.data.fpsCap = FlxG.save.data.fpsCap - 10;
 		(cast (Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 
-		OptionsMenu.versionShit.text = "Current FPS Cap: " + FlxG.save.data.fpsCap + " - Description - " + description;
+		OptionsState.versionShit.text = "Current FPS Cap: " + FlxG.save.data.fpsCap + " - Description - " + description;
 
 		return true;
 	}
@@ -312,7 +312,7 @@ class ScrollSpeedOption extends Option
 		if (FlxG.save.data.scrollSpeed > 10)
 			FlxG.save.data.scrollSpeed = 10;
 
-		OptionsMenu.versionShit.text = "Current Scroll Speed: " + OptionsMenu.truncateFloat(FlxG.save.data.scrollSpeed,1) + " - Description - " + description;
+		OptionsState.versionShit.text = "Current Scroll Speed: " + OptionsState.truncateFloat(FlxG.save.data.scrollSpeed,1) + " - Description - " + description;
 		return true;
 	}
 
@@ -326,7 +326,7 @@ class ScrollSpeedOption extends Option
 			FlxG.save.data.scrollSpeed = 10;
 
 
-		OptionsMenu.versionShit.text = "Current Scroll Speed: " + OptionsMenu.truncateFloat(FlxG.save.data.scrollSpeed,1) + " - Description - " + description;
+		OptionsState.versionShit.text = "Current Scroll Speed: " + OptionsState.truncateFloat(FlxG.save.data.scrollSpeed,1) + " - Description - " + description;
 		return true;
 	}
 }

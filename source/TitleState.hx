@@ -302,19 +302,21 @@ class TitleState extends MusicBeatState
 
 				var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/master/version.downloadMe");
 
-				http.onData = function (data:String) {
+				// http.onData = function (data:String) {
 				  
-				  	if (!MainMenuState.kadeEngineVer.contains(data.trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
-					{
-						trace('outdated lmao! ' + data.trim() + ' != ' + MainMenuState.kadeEngineVer);
-						OutdatedSubState.needVer = data;
-						FlxG.switchState(new OutdatedSubState());
-					}
-					else
-					{
-						FlxG.switchState(new MainMenuState());
-					}
-				}
+				//   	if (!MainMenuState.kadeEngineVer.contains(data.trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
+				// 	{
+				// 		trace('outdated lmao! ' + data.trim() + ' != ' + MainMenuState.kadeEngineVer);
+				// 		OutdatedSubState.needVer = data;
+				// 		FlxG.switchState(new OutdatedSubState());
+				// 	}
+				// 	else
+				// 	{
+				// 		FlxG.switchState(new MainMenuState());
+				// 	}
+				// }
+
+				FlxG.switchState(new MainMenuState());
 				
 				http.onError = function (error) {
 				  trace('error: $error');
@@ -426,13 +428,34 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = "Friday";
 			// credTextShit.screenCenter();
 			case 13:
-				addMoreText('Friday');
+				if (Main.watermarks)
+				{
+					addMoreText('FNF');
+				}
+				else
+				{
+					addMoreText('Friday');
+				}
 			// credTextShit.visible = true;
 			case 14:
-				addMoreText('Night');
+				if (Main.watermarks)
+				{
+					addMoreText('Kade Engine');
+				}
+				else
+				{
+					addMoreText('Night');
+				}
 			// credTextShit.text += '\nNight';
 			case 15:
-				addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
+				if (Main.watermarks)
+				{
+					addMoreText('Moddable');
+				}
+				else
+				{
+					addMoreText('Funkin');
+				}
 
 			case 16:
 				skipIntro();
